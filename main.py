@@ -4,11 +4,19 @@ from routers import video, progress
 
 app = FastAPI(title="Elimu Backend")
 
+""" Sécurité de CROS (mettre jour les origines autoriséesen production)
+par exemple 'ALLOWED_ORIGINS = ["http://localhost:3000",
+                   "https://site.com"]'
+                   donc on ne va pas autorisé toute les origines
+                   """
+
 # Configuration des CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Autoriser toutes les origines (à restreindre en prod)
     allow_credentials=True,
+    #Pourquoi autoriser toutes les méthodes, pourquoi oas restreindre juste les
+    # nécessaires et même pour led headers
     allow_methods=["*"],  # Autoriser toutes les méthodes HTTP (GET, POST, etc.)
     allow_headers=["*"],  # Autoriser tous les headers
 )
