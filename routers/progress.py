@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends #,HTTPException
 from sqlalchemy.orm import Session
-import crud, database, schemas
+import crud, database, schemas #,models
 
+
+#router = APIRouter(prefix="/progress", tags = ["Progression"])
 router = APIRouter()
 
 def get_db():
@@ -11,6 +13,16 @@ def get_db():
     finally:
         db.close()
 
-@router.post("/")
+@router.post("/") #status_cose = 201
 def track_progress(progress: schemas.ProgressCreate, db: Session = Depends(get_db)):
+    """
+    # Verification de si la vidéo existe avant d'ajouter la progression
+    video = db.query(models.Video).filter(models.Video.id == progress.video_id).first()
+    if not video : 
+        Fasle
+    HTTPException(status_code = 404, detail = "Video non trouvée")
+    return👇🏾👇🏾
+
+    """
+    
     return crud.track_progress(db, progress.video_id, progress.mentee_email)
