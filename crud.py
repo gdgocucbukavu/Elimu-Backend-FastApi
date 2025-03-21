@@ -3,6 +3,7 @@ from models import Video, Progress
 from youtube_api import get_youtube_video_data
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
+# essaie de gérer les erreurs, Donc appel du module HttpException
 
 def extract_video_id(youtube_url: str) -> str:
     """
@@ -30,12 +31,20 @@ def create_video(db: Session, youtube_input: str, mentor_email: str, category: s
         video_id = extract_video_id(youtube_input)
     else:
         video_id = youtube_input  # On considère que c'est déjà un ID
+    # Gestion d'erreur en cas not video_id ca raise status_code 400
+    # et aussi vérifier si la vidéo existe déjà
+    """
+    existing_video = db.query(Video).filter(Video.youtube_url == youtube_input).first()
+    if existing_video : 
+        raise HTTPException(status_code = 400, detail = "Crtte video est déjà enregistré")
 
+        """"
     # Récupérer les données de la vidéo en utilisant l'ID
     video_data = get_youtube_video_data(video_id)
     if video_data is None:
         print("Impossible de récupérer les données de la vidéo.")
         return None
+    #Gerer ici l'erreur aussi une fois ca arrive d'etre impossible de récupérer les données de la vidéo.
 
     video = Video(
         youtube_url=video_data["video_id"],  # Stocke uniquement l'ID de la vidéo
@@ -55,6 +64,7 @@ def create_video(db: Session, youtube_input: str, mentor_email: str, category: s
     return video
 
 def track_progress(db: Session, video_id: int, mentee_email: str):
+    # la progression doit se faire si la vidéo existe. on peut vérifier avant si la vidéo existe et puis si la progression existe aussi
     progress = db.query(Progress).filter(Progress.video_id == video_id, Progress.mentee_email == mentee_email).first()
     if progress:
         progress.watched += 1
@@ -84,6 +94,7 @@ def delete_video(db: Session, video_id: int):
     video = db.query(Video).filter(Video.id == video_id).first()
     if not video:
         return None
+    #Gestion d'erreur pour des vidéos si qui seront non trouvées au lieu de None
 
     db.delete(video)
     db.commit()
