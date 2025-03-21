@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS videos (
     publication_date DATETIME NOT NULL,
     views INT DEFAULT 0,
     likes INT DEFAULT 0,
-    stars FLOAT DEFAULT 0.0
+    stars FLOAT DEFAULT 0.0,
+    -- ordre INT NOT NULL DEFAULT 1 (Ajout du champ `ordre`)
 );
 
 -- Création de la table de suivi de progression
