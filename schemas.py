@@ -7,6 +7,7 @@ class VideoCreate(BaseModel):
     youtube_url: str
     mentor_email: str
     category: str
+    # ordre : int 
 
 class VideoResponse(VideoCreate):
     id: int
@@ -27,6 +28,7 @@ class VideoUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     category: Optional[str] = None
+    # ordre : int |None = None
 
 
 class ProgressCreate(BaseModel):
