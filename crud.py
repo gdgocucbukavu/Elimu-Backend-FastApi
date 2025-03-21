@@ -21,7 +21,7 @@ def extract_video_id(youtube_url: str) -> str:
         return parse_qs(parsed_url.query).get("v", [None])[0]
     return None
 
-def create_video(db: Session, youtube_input: str, mentor_email: str, category: str):
+def create_video(db: Session, youtube_input: str, mentor_email: str, category: str): # ajouter la variable ordre
     """
     Crée une entrée vidéo dans la base de données à partir d'une URL YouTube ou d'un ID.
     La fonction extrait l'ID de la vidéo et récupère les informations associées.
@@ -50,6 +50,7 @@ def create_video(db: Session, youtube_input: str, mentor_email: str, category: s
         youtube_url=video_data["video_id"],  # Stocke uniquement l'ID de la vidéo
         mentor_email=mentor_email,
         category=category,
+        # ordre = ordre
         title=video_data["title"],
         description=video_data["description"],
         publication_date=datetime.fromisoformat(
