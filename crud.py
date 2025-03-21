@@ -75,7 +75,7 @@ def track_progress(db: Session, video_id: int, mentee_email: str):
     db.commit()
     return progress
 
-def update_video(db: Session, video_id: int, title: str = None, description: str = None, category: str = None):
+def update_video(db: Session, video_id: int, title: str = None, description: str = None, category: str = None): # ajout de la variable ordre ( ordre : int | None)
     video = db.query(Video).filter(Video.id == video_id).first()
     if not video:
         return None
@@ -86,6 +86,11 @@ def update_video(db: Session, video_id: int, title: str = None, description: str
         video.description = description
     if category:
         video.category = category
+    """ 
+    une mise en jour de l'ordre
+    if ordre is not None : 
+        video.ordre = ordre
+    """
 
     db.commit()
     db.refresh(video)
@@ -100,3 +105,9 @@ def delete_video(db: Session, video_id: int):
     db.delete(video)
     db.commit()
     return video
+""" 
+
+une fonction pour récupérer toutes les vidéos triées 
+def get_all_videos(db: Session):
+    return db.query(models.Video).order_by(models.Video.ordre).all()
+    """
