@@ -6,6 +6,7 @@ import crud, database, schemas #,models
 #router = APIRouter(prefix="/progress", tags = ["Progression"])
 router = APIRouter()
 
+# c'est und fonction sui doit être ands database.py, appeler là depuis là 
 def get_db():
     db = database.SessionLocal()
     try:
@@ -24,5 +25,5 @@ def track_progress(progress: schemas.ProgressCreate, db: Session = Depends(get_d
     return👇🏾👇🏾
 
     """
-    
+    # c'est possible aussi d'avoir une erreur 400 lors de l'echec de suivie de la progression.
     return crud.track_progress(db, progress.video_id, progress.mentee_email)
