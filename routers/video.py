@@ -23,7 +23,7 @@ def create_video(video: schemas.VideoCreate, db: Session = Depends(get_db)):
     puis 👇🏾👇🏾
     """
     
-    return crud.create_video(db, video.youtube_url, video.mentor_email, video.category)
+    return crud.create_video(db, video.youtube_url, video.mentor_email, video.category) # (vidéo.ordre ) pour s'assurer que la vidéo est créée par ord
 
 @router.get("/{video_id}", response_model=schemas.VideoResponse)
 def get_video(video_id: int, db: Session = Depends(get_db)):
