@@ -18,6 +18,7 @@ class Video(Base):
     publication_date = Column(DateTime)# , default= datatime.utcnow
     title = Column(String) #nullable = True
     description = Column(String) # nullable = True
+    # Ajout du champs ordre ( ordre = Column(Integer, nullable= False, default= 1)
 
     """
     Selon mes analyses c'est possible qu'il ait une relation avec Progress
