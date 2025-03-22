@@ -10,16 +10,19 @@ def extract_video_id(youtube_url: str) -> str:
     - https://www.youtube.com/watch?v=VIDEO_ID
     - https://youtu.be/VIDEO_ID
     """
-    parsed_url = urlparse(youtube_url)
+    try:
+        parsed_url = urlparse(youtube_url)
 
-    if "youtu.be" in parsed_url.netloc:
-        return parsed_url.path.lstrip("/")
+        if "youtu.be" in parsed_url.netloc:
+            return parsed_url.path.lstrip("/")
 
-    if "youtube.com" in parsed_url.netloc:
-        # Récupère l'ID dans les paramètres de l'URL (ex: ?v=VIDEO_ID)
-        return parse_qs(parsed_url.query).get("v", [None])[0]
+        if "youtube.com" in parsed_url.netloc:
+            # Récupère l'ID dans les paramètres de l'URL (ex: ?v=VIDEO_ID)
+            return parse_qs(parsed_url.query).get("v", [None])[0]
 
-    return None  # Si l'URL n'est pas valide
+        raise ValueError("URL YouTube invalide.")  # Lève une exception si l'URL ne correspond pas
+    except Exception as e:
+        raise ValueError(f"Erreur lors de l'extraction de l'ID de la vidéo : {e}")
 
 
 def get_youtube_video_data(video_input: str) -> dict:
@@ -29,46 +32,60 @@ def get_youtube_video_data(video_input: str) -> dict:
     Si l'entrée est une URL, l'ID sera extrait automatiquement.
     Sinon, on considère que l'entrée est directement un ID.
     """
-    # Vérification si l'entrée ressemble à une URL YouTube
-    if "youtube.com" in video_input or "youtu.be" in video_input:
-        video_id = extract_video_id(video_input)
+    try:
+        # Vérification si l'entrée ressemble à une URL YouTube
+        if "youtube.com" in video_input or "youtu.be" in video_input:
+            video_id = extract_video_id(video_input)
+        else:
+            video_id = video_input  # Considère que l'entrée est directement un ID
+
         if not video_id:
-            print("Erreur : URL YouTube invalide.")
-            return None
-    else:
-        video_id = video_input  # Considère que l'entrée est directement un ID
+            raise ValueError("Impossible d'extraire un ID de vidéo valide.")
 
-    # Construction de l'URL pour appeler l'API YouTube
-    url = f"https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id={video_id}&key={YOUTUBE_API_KEY}"
-    response = requests.get(url).json()
+        # Construction de l'URL pour appeler l'API YouTube
+        url = f"https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id={video_id}&key={YOUTUBE_API_KEY}"
 
-    print("Réponse API YouTube :", response)  # DEBUG
+        try:
+            response = requests.get(url, timeout=5)  # Timeout pour éviter un blocage infini
+            response.raise_for_status()  # Vérifie si la requête a échoué
+            data = response.json()
+        except requests.exceptions.RequestException as e:
+            raise ConnectionError(f"Erreur lors de la requête API YouTube : {e}")
 
-    if "error" in response:
-        print("Erreur API YouTube :", response["error"])
-        return None
+        if "error" in data:
+            raise ValueError(f"Erreur API YouTube : {data['error']}")
 
-    if "items" not in response or not response["items"]:
-        print(f"Aucune vidéo trouvée pour l'ID {video_id}")
-        return None
+        if "items" not in data or not data["items"]:
+            raise ValueError(f"Aucune vidéo trouvée pour l'ID {video_id}")
 
-    video_data = response["items"][0]
-    snippet = video_data["snippet"]
-    stats = video_data.get("statistics", {})
+        video_data = data["items"][0]
+        snippet = video_data.get("snippet", {})
+        stats = video_data.get("statistics", {})
 
-    return {
-        "video_id": video_id,
-        "title": snippet.get("title", "Titre inconnu"),
-        "description": snippet.get("description", "Pas de description"),
-        "publication_date": snippet.get("publishedAt", ""),
-        "views": int(stats.get("viewCount", 0)),
-        "likes": int(stats.get("likeCount", 0))
-    }
+        return {
+            "video_id": video_id,
+            "title": snippet.get("title", "Titre inconnu"),
+            "description": snippet.get("description", "Pas de description"),
+            "publication_date": snippet.get("publishedAt", ""),
+            "views": int(stats.get("viewCount", 0)),
+            "likes": int(stats.get("likeCount", 0))
+        }
 
+    except ValueError as ve:
+        print(f"Erreur de validation : {ve}")
+    except ConnectionError as ce:
+        print(f"Erreur de connexion : {ce}")
+    except Exception as e:
+        print(f"Erreur inconnue : {e}")
+
+    return None  # Retourne None en cas d'erreur
 
 
 # Exemple d'utilisation
 url_video = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 video_info = get_youtube_video_data(url_video)
-print(video_info)
 
+if video_info:
+    print(video_info)
+else:
+    print("Impossible de récupérer les données de la vidéo.")
