@@ -106,5 +106,46 @@ class ReviewResponse(BaseModel):
     class Config:
         orm_mode = True
 
+# ==============================================================================
+# Schéma de création d'un utilisateur
+# ==============================================================================
+class UserCreate(BaseModel):
+    # Nom de l'utilisateur
+    name: str
+    # Email de l'utilisateur
+    email: str
+    # Indique si l'utilisateur est connecté (optionnel, par défaut False)
+    is_logged_in: Optional[bool] = False
+    # URL de la photo de profil (optionnel)
+    profile_picture_uri: Optional[str] = ""
+    # Track ou parcours de l'utilisateur
+    track: str
+    # Mentor associé à l'utilisateur
+    mentor: str
+
+# ==============================================================================
+# Schéma de réponse pour un utilisateur
+# ==============================================================================
+class UserResponse(BaseModel):
+    # Identifiant unique de l'utilisateur
+    id: int
+    # Nom de l'utilisateur
+    name: str
+    # Email de l'utilisateur
+    email: str
+    # Indicateur de connexion
+    is_logged_in: bool
+    # URL de la photo de profil
+    profile_picture_uri: str
+    # Track ou parcours de l'utilisateur
+    track: str
+    # Mentor associé à l'utilisateur
+    mentor: str
+    # Date de création du compte
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
 # Mise à jour des références en avant pour résoudre "ProgressResponse" et "ReviewResponse"
 VideoResponse.update_forward_refs()

@@ -53,8 +53,24 @@ CREATE TABLE IF NOT EXISTS reviews (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ======================================================================
+-- Création de la table "users"
+-- Cette table stocke les informations relatives aux utilisateurs.
+-- ======================================================================
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,                -- Identifiant unique de l'utilisateur
+    name VARCHAR(255) NOT NULL,                        -- Nom de l'utilisateur
+    email VARCHAR(255) NOT NULL UNIQUE,                -- Email de l'utilisateur (doit être unique)
+    is_logged_in TINYINT(1) DEFAULT 0,                 -- Indique si l'utilisateur est connecté (0 = false, 1 = true)
+    profile_picture_uri VARCHAR(255) DEFAULT '',       -- URL de la photo de profil (optionnel)
+    track VARCHAR(100) NOT NULL,                       -- Track ou parcours de l'utilisateur
+    mentor VARCHAR(100) NOT NULL,                      -- Mentor associé à l'utilisateur
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP      -- Date de création du compte
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ======================================================================
 -- Création d'index pour optimiser les requêtes sur les emails
 -- ======================================================================
 CREATE INDEX idx_mentor_email ON videos(mentor_email);
 CREATE INDEX idx_mentee_email_progress ON progress(mentee_email);
 CREATE INDEX idx_mentee_email_reviews ON reviews(mentee_email);
+CREATE INDEX idx_user_email ON users(email);

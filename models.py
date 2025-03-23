@@ -1,6 +1,4 @@
-
-
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Text, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from database import Base
@@ -37,7 +35,9 @@ class Video(Base):
     # donc il est explicitement défini dans la base avec des guillemets.
     order = Column("order", Integer, nullable=False)
 
-
+    # --------------------------------------------------------------------------
+    # Définition de la relation avec la table Review
+    # --------------------------------------------------------------------------
     reviews = relationship("Review", back_populates="video",
                            cascade="all, delete-orphan")  # Ajout de la relation reviews
 
@@ -74,6 +74,9 @@ class Progress(Base):
     video = relationship("Video", back_populates="progresses")
 
 
+# ==============================================================================
+# Classe représentant un avis sur une vidéo
+# ==============================================================================
 class Review(Base):
 
     __tablename__ = "reviews"
@@ -85,4 +88,34 @@ class Review(Base):
     comment = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    # --------------------------------------------------------------------------
+    # Définition de la relation avec la table Video
+    # --------------------------------------------------------------------------
+    # Cet attribut permet d'accéder à l'objet Video associé à cet avis.
     video = relationship("Video", back_populates="reviews")
+
+
+# ==============================================================================
+# Classe représentant un utilisateur dans la base de données
+# ==============================================================================
+class User(Base):
+    __tablename__ = "users"  # Nom de la table dans la base de données
+
+    # --------------------------------------------------------------------------
+    # Définition des colonnes
+    # --------------------------------------------------------------------------
+    id = Column(Integer, primary_key=True, index=True)
+    # Nom de l'utilisateur
+    name = Column(String, nullable=False)
+    # Email unique de l'utilisateur
+    email = Column(String, unique=True, index=True, nullable=False)
+    # Indique si l'utilisateur est connecté ou non
+    is_logged_in = Column(Boolean, default=False)
+    # URL de la photo de profil de l'utilisateur
+    profile_picture_uri = Column(String, default="")
+    # Track ou parcours de l'utilisateur
+    track = Column(String, nullable=False)
+    # Mentor associé à l'utilisateur
+    mentor = Column(String, nullable=False)
+    # Date de création du compte, par défaut la date et l'heure actuelles
+    created_at = Column(DateTime, default=datetime.utcnow)

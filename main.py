@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import video, progress, reviews  # Importation du routeur review
+from routers import video, progress, reviews, user  # Ajout du routeur user
 
 app = FastAPI(title="Elimu Backend")
 
@@ -24,6 +24,7 @@ app.add_middleware(
 app.include_router(video.router, prefix="/videos", tags=["Videos"])
 app.include_router(progress.router, prefix="/progress", tags=["Progression"])
 app.include_router(reviews.router, prefix="", tags=["Reviews"])
+app.include_router(user.router, prefix="/users", tags=["Users"])
 
 if __name__ == "__main__":
     import uvicorn

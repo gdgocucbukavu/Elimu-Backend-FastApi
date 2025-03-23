@@ -1,13 +1,14 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from models import Video, Progress
+from models import Video, Progress  # Pour la gestion des vidéos et de la progression
 from youtube_api import get_youtube_video_data
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from models import Video, Review
+from models import Video, Review  # Pour la gestion des vidéos et des avis
 from schemas import ReviewCreate
+from models import User
 
 
 def extract_video_id(youtube_url: str) -> str:
@@ -220,3 +221,58 @@ def get_average_rating(db: Session, video_id: int):
         return round(total_stars / len(reviews), 2)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur interne lors du calcul de la note moyenne: {e}")
+
+
+# -------------------------------------------------------------------
+# User pour CRUD seulement
+# -------------------------------------------------------------------
+# Ces fonctions implémentent le CRUD de base pour le modèle User.
+# Veuillez vous assurer que le modèle User est bien défini dans vos modules
+# (par exemple dans models.py) avec les attributs appropriés (id, name, email, etc.).
+
+def create_user(db: Session, user_data: dict):
+    """
+    Crée un nouvel utilisateur.
+    """
+    # On suppose que 'user_data' est un dictionnaire contenant les champs requis
+    user = User(**user_data)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def get_user(db: Session, user_id: int):
+    """
+    Récupère un utilisateur par son ID.
+    """
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    return user
+
+
+def update_user(db: Session, user_id: int, update_data: dict):
+    """
+    Met à jour les informations d'un utilisateur.
+    """
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    for key, value in update_data.items():
+        setattr(user, key, value)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def delete_user(db: Session, user_id: int):
+    """
+    Supprime un utilisateur de la base de données.
+    """
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    db.delete(user)
+    db.commit()
+    return user
