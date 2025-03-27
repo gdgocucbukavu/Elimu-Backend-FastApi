@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2c46ee64-a896-4323-9644-5f4bcb63e89d" name="Changes" comment="Ajout de table Users">
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,6 +120,7 @@
       <workItem from="1741976573316" duration="158000" />
       <workItem from="1742454072529" duration="12392000" />
       <workItem from="1742556733204" duration="16291000" />
+      <workItem from="1742925003314" duration="60000" />
     </task>
     <task id="LOCAL-00001" summary="Ajout de table Users">
       <option name="closed" value="true" />
@@ -149,6 +152,6 @@
     <option name="LAST_COMMIT_MESSAGE" value="Ajout de table Users" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Elimu_backend$Elimu_backend.coverage" NAME="Elimu backend Coverage Results" MODIFIED="1742675545526" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Elimu_backend$Elimu_backend.coverage" NAME="Elimu backend Coverage Results" MODIFIED="1742751677318" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

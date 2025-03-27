@@ -1,14 +1,10 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from models import Video, Progress  # Pour la gestion des vidéos et de la progression
+from models import Video, Progress, Review, User  # Pour la gestion des vidéos, de la progression, des avis et des utilisateurs
+from schemas import ReviewCreate
 from youtube_api import get_youtube_video_data
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
-from sqlalchemy.orm import Session
-from fastapi import HTTPException
-from models import Video, Review  # Pour la gestion des vidéos et des avis
-from schemas import ReviewCreate
-from models import User
 
 
 def extract_video_id(youtube_url: str) -> str:
@@ -79,7 +75,8 @@ def create_video(db: Session, youtube_input: str, mentor_email: str, category: s
         publication_date=datetime.fromisoformat(video_data["publication_date"].replace("Z", "+00:00")),
         views=video_data["views"],
         likes=video_data["likes"],
-        order=order
+        order=order,
+        stars=0  # Initialisation de la note moyenne à 0
     )
     db.add(video)
     db.commit()
@@ -164,7 +161,13 @@ def delete_video(db: Session, video_id: int):
 
 def add_review(db: Session, review_data: ReviewCreate):
     """
-    Ajoute un avis à une vidéo.
+    Ajoute un avis à une vidéo et met à jour la note moyenne (stars) de la vidéo.
+
+    Étapes :
+    1. Vérifie que la vidéo existe.
+    2. Vérifie qu'un avis n'a pas déjà été laissé par ce même utilisateur pour éviter les doublons.
+    3. Crée l'avis et l'enregistre dans la base de données.
+    4. Recalcule la note moyenne de la vidéo en additionnant toutes les cotations (stars) et en divisant par le nombre total d'avis.
     """
     try:
         # Vérifier si la vidéo existe
@@ -180,7 +183,7 @@ def add_review(db: Session, review_data: ReviewCreate):
         if existing_review:
             raise HTTPException(status_code=400, detail="Vous avez déjà laissé un avis pour cette vidéo")
 
-        # Créer la review
+        # Création de l'avis
         review = Review(
             video_id=review_data.video_id,
             mentee_email=review_data.mentee_email,
@@ -190,6 +193,16 @@ def add_review(db: Session, review_data: ReviewCreate):
         db.add(review)
         db.commit()
         db.refresh(review)
+
+        # Mise à jour de la note moyenne de la vidéo
+        reviews = db.query(Review).filter(Review.video_id == review_data.video_id).all()
+        total_stars = sum(r.stars for r in reviews)
+        # Calcul de la moyenne (arrondi à 2 décimales)
+        average_rating = round(total_stars / len(reviews), 2)
+        video.stars = average_rating  # Mise à jour de l'attribut 'stars' de la vidéo
+        db.commit()
+        db.refresh(video)
+
         return review
 
     except HTTPException as he:
@@ -201,6 +214,9 @@ def add_review(db: Session, review_data: ReviewCreate):
 def get_reviews_for_video(db: Session, video_id: int):
     """
     Récupère les avis d'une vidéo.
+
+    Returns:
+        Liste des avis (reviews) associés à la vidéo.
     """
     try:
         reviews = db.query(Review).filter(Review.video_id == video_id).all()
@@ -211,7 +227,10 @@ def get_reviews_for_video(db: Session, video_id: int):
 
 def get_average_rating(db: Session, video_id: int):
     """
-    Calcule la note moyenne d'une vidéo.
+    Calcule la note moyenne d'une vidéo à partir de tous ses avis.
+
+    Returns:
+        Note moyenne arrondie à 2 décimales. Retourne 0 s'il n'y a pas d'avis.
     """
     try:
         reviews = db.query(Review).filter(Review.video_id == video_id).all()
@@ -224,7 +243,7 @@ def get_average_rating(db: Session, video_id: int):
 
 
 # -------------------------------------------------------------------
-# User pour CRUD seulement
+# Fonctions CRUD pour les utilisateurs
 # -------------------------------------------------------------------
 # Ces fonctions implémentent le CRUD de base pour le modèle User.
 # Veuillez vous assurer que le modèle User est bien défini dans vos modules
@@ -234,7 +253,6 @@ def create_user(db: Session, user_data: dict):
     """
     Crée un nouvel utilisateur.
     """
-    # On suppose que 'user_data' est un dictionnaire contenant les champs requis
     user = User(**user_data)
     db.add(user)
     db.commit()

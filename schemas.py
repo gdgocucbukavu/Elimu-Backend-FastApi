@@ -33,6 +33,8 @@ class VideoResponse(VideoCreate):
     views: int
     # Nombre de likes de la vidéo
     likes: int
+    # Note moyenne calculée à partir des avis (stars)
+    stars: float
     order: Optional[int] = None  # Optionnel, calculé dynamiquement si non fourni
     # Liste de progressions liées à la vidéo
     progresses: List["ProgressResponse"] = []

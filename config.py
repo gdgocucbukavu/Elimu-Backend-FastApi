@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # URL de la base de données avec une valeur par défaut pour le développement local
-DATABASE_URL = os.getenv("DATABASE_URL", "mysql+mysqlconnector://root:@localhost/elimu")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Clé API YouTube : essentielle pour les appels à l'API YouTube
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")

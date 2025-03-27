@@ -13,39 +13,33 @@ class Video(Base):
     # Définition des colonnes
     # --------------------------------------------------------------------------
     id = Column(Integer, primary_key=True, index=True)
-    # URL unique de la vidéo YouTube
+    # URL unique de la vidéo YouTube (ici, on stocke l'ID de la vidéo)
     youtube_url = Column(String, unique=True, nullable=False)
     # Email du mentor associé à la vidéo
     mentor_email = Column(String, nullable=False)
     # Catégorie de la vidéo (ex: tutoriel, entretien, etc.)
     category = Column(String, nullable=False)
-    # Évaluation par étoiles, valeur par défaut 0.0
+    # Note moyenne calculée à partir des avis (stars), initialisée à 0.0
     stars = Column(Float, default=0.0)
     # Nombre de likes
     likes = Column(Integer, default=0)
     # Nombre de vues
     views = Column(Integer, default=0)
-    # Date de publication, ici par défaut la date et l'heure actuelles
+    # Date de publication ; par défaut, la date et l'heure actuelles
     publication_date = Column(DateTime, default=datetime.utcnow)
-    # Titre de la vidéo (peut être optionnel)
+    # Titre de la vidéo (optionnel)
     title = Column(String, nullable=True)
-    # Description de la vidéo (peut être optionnel)
+    # Description de la vidéo (optionnel)
     description = Column(String, nullable=True)
-    # Champ pour l'ordre d'affichage. Le nom "order" est un mot réservé,
-    # donc il est explicitement défini dans la base avec des guillemets.
+    # Ordre d'affichage de la vidéo (le nom "order" étant un mot réservé, on le définit explicitement)
     order = Column("order", Integer, nullable=False)
 
     # --------------------------------------------------------------------------
-    # Définition de la relation avec la table Review
+    # Relations avec d'autres tables
     # --------------------------------------------------------------------------
-    reviews = relationship("Review", back_populates="video",
-                           cascade="all, delete-orphan")  # Ajout de la relation reviews
-
-    # --------------------------------------------------------------------------
-    # Définition de la relation avec la table Progress
-    # --------------------------------------------------------------------------
-    # 'progresses' sera un attribut list contenant toutes les entrées de progression associées à cette vidéo.
-    # cascade="all, delete-orphan" permet de supprimer toutes les progressions associées si la vidéo est supprimée.
+    # Relation avec la table Review pour accéder aux avis de la vidéo.
+    reviews = relationship("Review", back_populates="video", cascade="all, delete-orphan")
+    # Relation avec la table Progress pour accéder aux progressions de visionnage.
     progresses = relationship("Progress", back_populates="video", cascade="all, delete-orphan")
 
 
@@ -60,17 +54,17 @@ class Progress(Base):
     # --------------------------------------------------------------------------
     id = Column(Integer, primary_key=True, index=True)
     # Clé étrangère liant la progression à une vidéo spécifique.
-    # ondelete="CASCADE" assure que la progression sera supprimée si la vidéo associée est supprimée.
+    # ondelete="CASCADE" permet de supprimer la progression si la vidéo associée est supprimée.
     video_id = Column(Integer, ForeignKey("videos.id", ondelete="CASCADE"), nullable=False)
-    # Email du mentee pour lequel la progression est enregistrée
+    # Email du mentee pour lequel la progression est enregistrée.
     mentee_email = Column(String, nullable=False)
-    # Quantité de la vidéo regardée (par exemple, en secondes ou en pourcentage)
+    # Indique la quantité de la vidéo regardée (par exemple en secondes ou en pourcentage).
     watched = Column(Integer, default=0)
 
     # --------------------------------------------------------------------------
-    # Définition de la relation avec la table Video
+    # Relation avec la table Video
     # --------------------------------------------------------------------------
-    # Cet attribut permet d'accéder facilement à l'objet Video associé à cette progression.
+    # Permet d'accéder à l'objet Video associé à cette progression.
     video = relationship("Video", back_populates="progresses")
 
 
@@ -78,20 +72,27 @@ class Progress(Base):
 # Classe représentant un avis sur une vidéo
 # ==============================================================================
 class Review(Base):
+    __tablename__ = "reviews"  # Nom de la table dans la base de données
 
-    __tablename__ = "reviews"
-
+    # --------------------------------------------------------------------------
+    # Définition des colonnes
+    # --------------------------------------------------------------------------
     id = Column(Integer, primary_key=True, index=True)
+    # Clé étrangère liant l'avis à une vidéo spécifique.
     video_id = Column(Integer, ForeignKey("videos.id", ondelete="CASCADE"), nullable=False)
+    # Email du mentee qui a laissé l'avis.
     mentee_email = Column(String, nullable=False)
+    # Évaluation par étoiles donnée dans l'avis (valeur attendue entre 1 et 5).
     stars = Column(Integer, nullable=False)
+    # Commentaire associé à l'avis (optionnel).
     comment = Column(Text, nullable=True)
+    # Date de création de l'avis ; par défaut, la date et l'heure actuelles.
     created_at = Column(DateTime, default=datetime.utcnow)
 
     # --------------------------------------------------------------------------
-    # Définition de la relation avec la table Video
+    # Relation avec la table Video
     # --------------------------------------------------------------------------
-    # Cet attribut permet d'accéder à l'objet Video associé à cet avis.
+    # Permet d'accéder à l'objet Video associé à cet avis.
     video = relationship("Video", back_populates="reviews")
 
 
@@ -105,17 +106,17 @@ class User(Base):
     # Définition des colonnes
     # --------------------------------------------------------------------------
     id = Column(Integer, primary_key=True, index=True)
-    # Nom de l'utilisateur
+    # Nom de l'utilisateur.
     name = Column(String, nullable=False)
-    # Email unique de l'utilisateur
+    # Email unique de l'utilisateur.
     email = Column(String, unique=True, index=True, nullable=False)
-    # Indique si l'utilisateur est connecté ou non
+    # Indique si l'utilisateur est connecté.
     is_logged_in = Column(Boolean, default=False)
-    # URL de la photo de profil de l'utilisateur
+    # URL de la photo de profil de l'utilisateur.
     profile_picture_uri = Column(String, default="")
-    # Track ou parcours de l'utilisateur
+    # Track ou parcours de l'utilisateur.
     track = Column(String, nullable=False)
-    # Mentor associé à l'utilisateur
+    # Mentor associé à l'utilisateur.
     mentor = Column(String, nullable=False)
-    # Date de création du compte, par défaut la date et l'heure actuelles
+    # Date de création du compte ; par défaut, la date et l'heure actuelles.
     created_at = Column(DateTime, default=datetime.utcnow)
