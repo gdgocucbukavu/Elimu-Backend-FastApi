@@ -5,7 +5,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # URL de la base de données avec une valeur par défaut pour le développement local
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
+
+if not DATABASE_URL:
+    raise ValueError("La variable d'environnement DATABASE_URL doit être définie.")
 
 # Clé API YouTube : essentielle pour les appels à l'API YouTube
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
