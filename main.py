@@ -1,26 +1,26 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import video, progress, reviews, user  # Ajout du routeur user
+from routers import video, progress, reviews, user
 
 app = FastAPI(title="Elimu Backend")
 
-# Configuration des CORS : autorise uniquement les domaines spécifiés
+# Maintenant on autorise aussi localhost:4200 (Angular dev) et, si besoin, l'URL de ton front en production
 ALLOWED_ORIGINS = [
-    "https://mon-site.com",
-    "https://app.mon-site.com",
-    "http://localhost:3000"
+    "http://localhost:4200",                        # Angular en dev
+    "https://mon-site.com",                         # front en prod
+    "https://app.mon-site.com",                     # autre domaine prod
+    # si tu déploies ton front ailleurs, ajoute-le ici
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],  # Autorise toutes les méthodes HTTP (GET, POST, PUT, etc.)
-    allow_headers=["Content-Type", "Authorization"],
+    allow_methods=["*"],
+    allow_headers=["*"],   # tu peux élargir à "*" pour ne rien bloquer
 )
 
-# Inclusion des routes avec préfixes pour une meilleure organisation
 app.include_router(video.router, prefix="/videos", tags=["Videos"])
 app.include_router(progress.router, prefix="/progress", tags=["Progression"])
 app.include_router(reviews.router, prefix="", tags=["Reviews"])
