@@ -11,6 +11,9 @@ ALLOWED_ORIGINS = [
     "https://mon-site.com",                         # front en prod
     "https://app.mon-site.com",                     # autre domaine prod
     # si tu déploies ton front ailleurs, ajoute-le ici
+
+   "https://elimu-gdgocucb.firebaseapp.com/",
+    "https://elimu-gdgocucb.web.app/"
 ]
 
 app.add_middleware(
